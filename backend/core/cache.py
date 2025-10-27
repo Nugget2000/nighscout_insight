@@ -1,4 +1,3 @@
-import json
 from datetime import datetime
 from google.cloud import firestore
 from core.config import settings

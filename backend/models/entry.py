@@ -1,6 +1,5 @@
 from pydantic import BaseModel, computed_field
-from typing import Optional, Dict, Any
-from dataclasses import field
+from typing import Optional
 
 class Entry(BaseModel):
     """Pydantic model for a Nightscout entry."""
@@ -14,7 +13,6 @@ class Entry(BaseModel):
     trend: int
     direction: str
     device: str
-    type: str
     utcOffset: int
     sysTime: str
     # mills: int

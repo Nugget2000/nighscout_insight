@@ -1,6 +1,5 @@
-from fastapi import APIRouter, Depends, Security
+from fastapi import APIRouter, Security
 from typing import List, Dict
-from datetime import datetime, time
 
 from services.nightscout_service import get_nightscout_entries, get_nightscout_treatments
 from services.kpi_service import calculate_kpis

@@ -1,7 +1,7 @@
 import requests
 from typing import Optional, List
 from pydantic import ValidationError
-from datetime import datetime, time
+from datetime import datetime
 
 from models.entry import Entry
 from models.treatment import Treatment
