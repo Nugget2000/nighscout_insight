@@ -5,3 +5,4 @@ python-dotenv
 google-cloud-firestore
 google-generativeai
 requests
+numpy

@@ -16,7 +16,7 @@ class Entry(BaseModel):
     type: str
     utcOffset: int
     sysTime: str
-    mills: int
+    # mills: int
     
     @computed_field
     @property
