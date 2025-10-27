@@ -6,6 +6,7 @@ class Treatment(BaseModel):
     _id: str
     eventType: str
     created_at: str
+    cached_at: str
     glucose: Optional[str] = None
     glucoseType: Optional[str] = None
     carbs: Optional[int] = None

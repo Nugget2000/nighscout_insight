@@ -29,6 +29,7 @@ htmlcov/
 .coverage.*
 .cache
 nosetests.xml
+gcloud-keys.json
 
 # common extensions for react projects
 node_modules/

@@ -5,6 +5,7 @@ from datetime import datetime, time
 
 from models.entry import Entry
 from models.treatment import Treatment
+from core.cache import get_cache, set_cache
 
 
 def get_nightscout_entries(nightscout_url: str, api_token: str, from_date: str, to_date: str, count: int = 0) -> Optional[List[Entry]]:
@@ -21,6 +22,12 @@ def get_nightscout_entries(nightscout_url: str, api_token: str, from_date: str, 
     Returns:
         A list of validated Entry objects, or None if an error occurred.
     """
+    cache_key = f"entries_{from_date}_{to_date}_{count}"
+    cached_entries = get_cache(cache_key)
+    if cached_entries:
+        return [Entry.model_validate(entry_data) for entry_data in cached_entries]
+    else:
+        print(f"cache miss for entries for date range {from_date} - {to_date}")
     try:
         params = {
             "count": count,
@@ -32,6 +39,9 @@ def get_nightscout_entries(nightscout_url: str, api_token: str, from_date: str, 
         response.raise_for_status()  # Raise an exception for bad status codes
 
         entries_data = response.json()
+        set_cache(cache_key, entries_data)
+        for entry in entries_data:
+            entry['cached_at'] = datetime.now().isoformat()
         validated_entries = [Entry.model_validate(entry_data) for entry_data in entries_data]
         return validated_entries
 
@@ -41,6 +51,7 @@ def get_nightscout_entries(nightscout_url: str, api_token: str, from_date: str, 
     except ValidationError as e:
         print(f"Error validating Nightscout data: {e}")
         return None
+
 
 def get_nightscout_treatments(nightscout_url: str, api_token: str, from_date: str, to_date: str, count: int = 0) -> Optional[List[Treatment]]:
     """
@@ -56,6 +67,11 @@ def get_nightscout_treatments(nightscout_url: str, api_token: str, from_date: st
     Returns:
         A list of validated Treatment objects, or None if an error occurred.
     """
+    cache_key = f"treatments_{from_date}_{to_date}_{count}"
+    cached_treatments = get_cache(cache_key)
+    if cached_treatments:
+        return [Treatment.model_validate(treatment_data) for treatment_data in cached_treatments]
+
     try:
         params = {
             "count": count,
@@ -67,6 +83,9 @@ def get_nightscout_treatments(nightscout_url: str, api_token: str, from_date: st
         response.raise_for_status()  # Raise an exception for bad status codes
 
         treatments_data = response.json()
+        set_cache(cache_key, treatments_data)
+        for treatment in treatments_data:
+            treatment['cached_at'] = datetime.now().isoformat()
         validated_treatments = [Treatment.model_validate(treatment_data) for treatment_data in treatments_data]
         return validated_treatments
 

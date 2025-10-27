@@ -15,6 +15,9 @@ class Settings:
     # GCP
     GCP_PROJECT_ID: str = os.getenv("GCP_PROJECT_ID")
 
+    # Cache
+    CACHE_ENABLED: bool = os.getenv("CACHE_ENABLED", "False").lower() == "true"
+
     # Gemini
     GEMINI_API_KEY: str = os.getenv("GEMINI_API_KEY")
 

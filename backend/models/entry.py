@@ -9,6 +9,7 @@ class Entry(BaseModel):
     
     date: int
     dateString: str
+    cached_at: str
     sgv: Optional[int] = None
     trend: int
     direction: str
