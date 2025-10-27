@@ -7,6 +7,7 @@ class Settings:
     # Nightscout
     NS_URL: str = os.getenv("NS_URL")
     NS_API_SECRET: str = os.getenv("NS_API_SECRET")
+    NS_TOKEN: str = os.getenv("NS_TOKEN")
 
     # API-säkerhet
     API_KEY_SECRET: str = os.getenv("API_KEY_SECRET")

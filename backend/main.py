@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from api import data
 
 app = FastAPI(
     title="Nightscout Insight API",
@@ -11,4 +12,4 @@ def read_root():
     """Enkel endpoint för att verifiera att servern körs."""
     return {"status": "ok"}
 
-# Här kommer vi senare att inkludera våra API-routers från api-katalogen
+app.include_router(data.router, prefix="/api/v1")
