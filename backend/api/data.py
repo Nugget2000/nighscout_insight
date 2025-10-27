@@ -15,4 +15,4 @@ def get_entries(count: int = 1):
         api_token=settings.NS_TOKEN,
         count=count
     )
-    return entries
+    return entries if entries is not None else []

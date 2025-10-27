@@ -1,9 +1,13 @@
 import requests
-from typing import Optional, List, Dict, Any
+from typing import Optional, List
+from pydantic import ValidationError
 
-def get_nightscout_entries(nightscout_url: str, api_token: str, count: int = 100) -> Optional[List[Dict[str, Any]]]:
+from models.entry import Entry
+
+
+def get_nightscout_entries(nightscout_url: str, api_token: str, count: int = 100) -> Optional[List[Entry]]:
     """
-    Fetches entries from the Nightscout API.
+    Fetches and validates entries from the Nightscout API.
 
     Args:
         nightscout_url: The URL of the Nightscout instance.
@@ -11,15 +15,24 @@ def get_nightscout_entries(nightscout_url: str, api_token: str, count: int = 100
         count: The number of entries to fetch.
 
     Returns:
-        A list of entry dictionaries, or None if an error occurred.
+        A list of validated Entry objects, or None if an error occurred.
     """
     try:
-        # headers = {"api-secret": api_token}
         params = {"count": count}
         request_url = f"{nightscout_url}/api/v1/entries.json?token={api_token}"
         response = requests.get(request_url, params=params)
         response.raise_for_status()  # Raise an exception for bad status codes
-        return response.json()
+
+        entries_data = response.json()
+        # Validate and parse the data using the Pydantic model
+        validated_entries = [Entry.model_validate(entry_data) for entry_data in entries_data]
+        return validated_entries
+
     except requests.exceptions.RequestException as e:
+        # Handle connection errors or bad responses
         print(f"Error fetching data from Nightscout: {e}")
+        return None
+    except ValidationError as e:
+        # Handle data validation errors
+        print(f"Error validating Nightscout data: {e}")
         return None
