@@ -1,14 +1,15 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Security
 from typing import List
 
 from services.nightscout_service import get_nightscout_entries
 from core.config import settings
+from core.security import get_api_key
 from models.entry import Entry
 
 router = APIRouter()
 
 @router.get("/entries", response_model=List[Entry], tags=["Data"])
-def get_entries(count: int = 1):
+def get_entries(count: int = 1, api_key: str = Security(get_api_key)):
     """Hämtar de senaste posterna från Nightscout."""
     entries = get_nightscout_entries(
         nightscout_url=settings.NS_URL,
