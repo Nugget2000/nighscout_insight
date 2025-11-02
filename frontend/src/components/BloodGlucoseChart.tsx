@@ -10,7 +10,7 @@ const CustomTooltip = ({ active, payload }: any) => {
     const data = payload[0].payload;
     return (
       <div style={{ backgroundColor: '#333', padding: '10px', border: '1px solid #666' }}>
-        <p>{`Time: ${new Date(data.date_date).toLocaleTimeString()}`}</p>
+        <p>{`Time: ${new Date(data.date).toLocaleTimeString('en-GB', { timeZone: 'UTC' })}`}</p>
         <p>{`mmol/L: ${data.mmol.toFixed(1)}`}</p>
         <p>{`SGV: ${data.sgv}`}</p>
         <p>{`Trend: ${data.trend}`}</p>
@@ -32,18 +32,18 @@ const BloodGlucoseChart = ({ entries }: BloodGlucoseChartProps) => {
     return null;
   }
 
-  const firstEntryDate = new Date(entries[0].date_date);
-  const startOfDay = new Date(firstEntryDate).setHours(0, 0, 0, 0);
-  const endOfDay = new Date(firstEntryDate).setHours(23, 59, 59, 999);
+  const firstEntryDate = new Date(entries[0].date_date + 'Z');
+  const startOfDay = new Date(firstEntryDate.getUTCFullYear(), firstEntryDate.getUTCMonth(), firstEntryDate.getUTCDate()).getTime();
+  const endOfDay = startOfDay + 24 * 60 * 60 * 1000 - 1;
 
   const ticks = [];
   for (let i = 0; i <= 24; i += 2) {
-    ticks.push(new Date(startOfDay).setHours(i));
+    ticks.push(startOfDay + i * 2 * 60 * 60 * 1000);
   }
 
   const formattedEntries = entries.map(entry => ({
     ...entry,
-    date: new Date(entry.date_date).getTime(), // use timestamp for x-axis
+    date: new Date(entry.date_date + 'Z').getTime(), // use timestamp for x-axis
     mmol: entry.sgv ? entry.sgv / 18 : 0,
   }));
 
@@ -56,7 +56,8 @@ const BloodGlucoseChart = ({ entries }: BloodGlucoseChartProps) => {
           type="number"
           domain={[startOfDay, endOfDay]}
           ticks={ticks}
-          tickFormatter={(unixTime) => new Date(unixTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                              
+          tickFormatter={(unixTime) => new Date(unixTime).toLocaleTimeString('en-GB', { timeZone: 'UTC', hour: '2-digit', minute: '2-digit' })}
         />
         <YAxis domain={[2.5, 14]} tickFormatter={(value) => value.toFixed(1)} />
         <Tooltip content={<CustomTooltip />} />

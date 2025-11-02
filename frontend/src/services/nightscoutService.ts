@@ -14,3 +14,17 @@ export const getEntries = async (date: string) => {
 
   return response.json();
 };
+
+export const getKpis = async (date: string) => {
+  const response = await fetch(`${BASE_URL}/kpis/${date}`, {
+    headers: {
+      'X-API-Key': API_KEY,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error('Network response was not ok');
+  }
+
+  return response.json();
+};

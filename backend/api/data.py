@@ -14,8 +14,8 @@ router = APIRouter()
 @router.get("/entries", response_model=List[Entry], tags=["Data"])
 def get_entries(date: str, api_key: str = Security(get_api_key)):
     """Hämtar de senaste posterna från Nightscout för ett specifikt datum."""
-    from_date = f"{date}T00:00:00Z"
-    to_date = f"{date}T23:59:59Z"
+    from_date = f"{date}T00:00:00"
+    to_date = f"{date}T23:59:59"
     entries = get_nightscout_entries(
         nightscout_url=settings.NS_URL,
         api_token=settings.NS_TOKEN,
@@ -27,8 +27,8 @@ def get_entries(date: str, api_key: str = Security(get_api_key)):
 @router.get("/treatments", response_model=List[Treatment], tags=["Data"])
 def get_treatments(date: str, api_key: str = Security(get_api_key)):
     """Hämtar de senaste behandlingarna från Nightscout för ett specifikt datum."""
-    from_date = f"{date}T00:00:00Z"
-    to_date = f"{date}T23:59:59Z"
+    from_date = f"{date}T00:00:00"
+    to_date = f"{date}T23:59:59"
     treatments = get_nightscout_treatments(
         nightscout_url=settings.NS_URL,
         api_token=settings.NS_TOKEN,
@@ -40,8 +40,8 @@ def get_treatments(date: str, api_key: str = Security(get_api_key)):
 @router.get("/kpis/{date}", response_model=Kpis, tags=["KPIs"])
 def get_kpis(date: str, api_key: str = Security(get_api_key)):
     """Beräknar och returnerar dagliga KPIer för ett specifikt datum."""
-    from_date = f"{date}T00:00:00Z"
-    to_date = f"{date}T23:59:59Z"
+    from_date = f"{date}T00:00:00"
+    to_date = f"{date}T23:59:59"
     entries = get_nightscout_entries(
         nightscout_url=settings.NS_URL,
         api_token=settings.NS_TOKEN,
