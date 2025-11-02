@@ -10,8 +10,8 @@ class Entry(BaseModel):
     dateString: str
     cached_at: str
     sgv: Optional[int] = None
-    trend: int
-    direction: str
+    trend: Optional[int] = None
+    direction: Optional[str] = None
     device: str
     utcOffset: int
     sysTime: str

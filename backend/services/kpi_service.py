@@ -49,7 +49,9 @@ def calculate_kpis(entries: List[Entry]) -> Dict[str, float]:
 
     # Estimated A1c (eA1c)
     # Using the formula: (mean_glucose_mg_dl + 46.7) / 28.7
-    ea1c = (mean_glucose + 46.7) / 28.7
+    #ea1c = (mean_glucose + 46.7) / 28.7
+    ea1c_percent = (mean_glucose + 2.59) / 1.59
+    ea1c = (ea1c_percent - 2.15) * 10.929
 
     # add bool that indicates if the day is within the accepted range for total_readings above 280 to ensure reliability
     total_readings_accepted = total_readings >= 275

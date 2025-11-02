@@ -24,7 +24,9 @@ def get_nightscout_entries(nightscout_url: str, api_token: str, from_date: str, 
     """
     cache_key = f"entries_{from_date}_{to_date}_{count}"
     cached_entries = get_cache(cache_key)
+
     if cached_entries:
+        print(f"cache hit for entries for date range {from_date} - {to_date}")
         return [Entry.model_validate(entry_data) for entry_data in cached_entries]
     else:
         print(f"cache miss for entries for date range {from_date} - {to_date}")
@@ -39,9 +41,17 @@ def get_nightscout_entries(nightscout_url: str, api_token: str, from_date: str, 
         response.raise_for_status()  # Raise an exception for bad status codes
 
         entries_data = response.json()
-        set_cache(cache_key, entries_data)
+
         for entry in entries_data:
             entry['cached_at'] = datetime.now().isoformat()
+
+            # convert date floats to date int
+            if "date" in entry:
+                entry["date"] = int(entry["date"])
+        
+        
+        set_cache(cache_key, entries_data)
+
         validated_entries = [Entry.model_validate(entry_data) for entry_data in entries_data]
         return validated_entries
 
