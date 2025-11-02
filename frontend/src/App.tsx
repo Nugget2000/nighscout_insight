@@ -7,6 +7,7 @@ import KpiCard from './components/KpiCard';
 import { Kpis } from './models/kpi';
 import TitrKpiCard from './components/TitrKpiCard';
 import AnalysisCard from './components/AnalysisCard';
+import OtherKpisCard from './components/OtherKpisCard';
 
 function App() {
   const [date, setDate] = useState(new Date());
@@ -102,6 +103,11 @@ function App() {
           </Grid>
           <Grid item xs={12}>
             <AnalysisCard date={dateString} />
+          </Grid>
+          <Grid item xs={12}>
+            {kpiIsLoading && <Typography>Loading other KPIs...</Typography>}
+            {kpiError && <Typography>Error loading other KPIs: {kpiError.message}</Typography>}
+            {kpiData && <OtherKpisCard kpi={kpiData} />}
           </Grid>
         </Grid>
       </Container>
