@@ -23,7 +23,7 @@ const TitrKpiCard = ({ kpi, kpiHistory }: KpiCardProps) => {
           Values between 3.9 and 7.8 mmol/L. Target above 50%
         </Typography>
         {formattedHistory && (
-          <ResponsiveContainer width="100%" height={200}>
+          <ResponsiveContainer width="100%" height={100}>
             <BarChart data={formattedHistory}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="date" />

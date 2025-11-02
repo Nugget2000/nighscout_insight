@@ -83,6 +83,11 @@ function App() {
         </Typography>
         <Grid container spacing={2}>
           <Grid item xs={12} md={8}>
+            {kpiIsLoading && <Typography>Loading other KPIs...</Typography>}
+            {kpiError && <Typography>Error loading other KPIs: {kpiError.message}</Typography>}
+            {kpiData && <OtherKpisCard kpi={kpiData} />}
+          </Grid>
+          <Grid item xs={12} md={8}>
             {entriesIsLoading && <Typography>Loading chart...</Typography>}
             {entriesError && <Typography>Error loading chart: {entriesError.message}</Typography>}
             {entriesData && <BloodGlucoseChart entries={entriesData} />}
@@ -103,11 +108,6 @@ function App() {
           </Grid>
           <Grid item xs={12}>
             <AnalysisCard date={dateString} />
-          </Grid>
-          <Grid item xs={12}>
-            {kpiIsLoading && <Typography>Loading other KPIs...</Typography>}
-            {kpiError && <Typography>Error loading other KPIs: {kpiError.message}</Typography>}
-            {kpiData && <OtherKpisCard kpi={kpiData} />}
           </Grid>
         </Grid>
       </Container>

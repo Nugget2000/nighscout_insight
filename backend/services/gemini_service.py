@@ -20,15 +20,24 @@ def analyze_day_data(entries: List[Entry], treatments: List[Treatment], kpis: Kp
     model = genai.GenerativeModel('gemini-2.5-pro')
 
     prompt = (
-        "You are an expert diabetes coach. Your task is to analyze a user's glucose data, "
-        "treatments, and key performance indicators (KPIs) for a single day. Provide a concise, "
-        "insightful analysis and actionable recommendations. Structure your response in a consise manner."
-        "You always answer in swedish and keep keep the answers brief and prioritize achievments and things"
-        "to improve or investigate." \
-        "Also provide a small summary of what treaments has occured, for example if there was many temp basals, " \
-        "pump changes, correction bolus or other events. "
+        """Du är en expert på typ 1-diabetes och tolkning av data från automatiserade insulinsystem.
+        Patienten är Erik, en 12-årig pojke med typ 1-diabetes. Han är oftast fysiskt aktiv men har vissa dagar då han tillbringar många timmar vid datorn.
+        Han använder Loop med Omnipod som insulinpump och Dexcom G7 för kontinuerlig glukosmätning (CGM).
+        Loop-systemet registrerar alla bolusdoser, basala förändringar, auto-korrigeringar, pumpbyten och andra händelser.
+        Din uppgift är att utifrån den tillgängliga datan för en given dag skapa en sammanfattning av glukosvariationer och behandlingsaktiviteter.
+        Sammanfattningen ska:
+        Vara skriven på svenska, anpassad för vårdpersonal och/eller föräldrar.
+        Lyfta fram positiva observationer (t.ex. stabil glukosnivåer, snabb korrigering av höga/låga värden, god TIR).
+        Prioritera att identifiera områden för förbättring eller vidare analys, till exempel:
+        återkommande hypoglykemier eller hyperglykemier,
+        trender relaterade till fysisk aktivitet eller stillasittande,
+        möjliga justeringar i kolhydratkvot, insulinkänslighet eller basalprofil,
+        tidsperioder då Loop-systemet auto-korrigerar ofta,
+        avvikande beteenden (t.ex. missade boluser, sent kvällsmål, pumpavbrott).
+        Avsluta med förslag på nästa steg i optimeringen av Erik’s diabetesbehandling.
+
+        Här är sammanhanget och datan för dagen:"""
         "\n\n"
-        "## Daily Summary\n"
         f"**Date:** {kpis.date}\n"
         f"**Time in Range (TIR):** {kpis.tir_percent:.1f}% (Target: >70%)\n"
         f"**Time in Tight Range (TITR):** {kpis.titr_percent:.1f}% (Target: >50%)\n"
@@ -36,14 +45,6 @@ def analyze_day_data(entries: List[Entry], treatments: List[Treatment], kpis: Kp
         f"**Standard Deviation:** {kpis.std_dev:.1f}\n"
         f"**eA1c:** {kpis.ea1c:.1f}%\n"
         "\n"
-        "## Analysis\n"
-        "Based on the data, here is an analysis of the day, highlighting periods of high and low glucose, "
-        "and potential correlations with meals or insulin doses."
-        "\n"
-        "## Recommendations\n"
-        "Here are some concrete recommendations for improving glucose control based on today's patterns."
-        "\n\n"
-        "Here is the raw data for the day:\n"
         f"**KPIs:**\n{kpis.model_dump_json(indent=2)}\n\n"
         f"**Glucose Entries (sample):**\n{[entry.model_dump_json() for entry in entries[:10]]}...\n\n"
         f"**Treatments (sample):**\n{[treatment.model_dump_json() for treatment in treatments[:5]]}...\n"

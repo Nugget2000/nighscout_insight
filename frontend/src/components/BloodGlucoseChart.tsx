@@ -55,7 +55,6 @@ const BloodGlucoseChart = ({ entries }: BloodGlucoseChartProps) => {
         <CartesianGrid strokeDasharray="3 3" />
         <XAxis
           dataKey="date"
-          type="number"
           domain={[startOfDay, endOfDay]}
           tickFormatter={(unixTime) => new Date(unixTime).toLocaleTimeString('en-GB', { timeZone: 'UTC', hour: '2-digit', minute: '2-digit' })}
         />
