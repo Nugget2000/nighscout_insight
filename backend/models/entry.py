@@ -1,5 +1,6 @@
 from pydantic import BaseModel, computed_field
 from typing import Optional
+from datetime import datetime
 
 class Entry(BaseModel):
     """Pydantic model for a Nightscout entry."""
@@ -25,4 +26,8 @@ class Entry(BaseModel):
             return round(self.sgv / 18, 1)
         return None
 
-    
+    @computed_field
+    @property
+    def date_date(self) -> datetime:
+        """Return the date as a datetime object."""
+        return datetime.fromtimestamp(self.date / 1000)

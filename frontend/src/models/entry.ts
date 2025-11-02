@@ -1,7 +1,15 @@
 export interface Entry {
-  id: string;
-  device: string;
+  _id: string;
+  type: string;
   date: number;
-  sgv: number;
-  direction: string;
+  dateString: string;
+  date_date: string;
+  cached_at: string;
+  sgv?: number;
+  trend?: number;
+  direction?: string;
+  device: string;
+  utcOffset: number;
+  sysTime: string;
+  mmol: number;
 }

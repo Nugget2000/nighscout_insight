@@ -1,14 +1,30 @@
-import { AppBar, Container, CssBaseline, Toolbar, Typography } from '@mui/material';
+import { AppBar, Button, ButtonGroup, Container, CssBaseline, Toolbar, Typography } from '@mui/material';
 import { useQuery } from '@tanstack/react-query';
 import { getEntries } from './services/nightscoutService';
 import BloodGlucoseChart from './components/BloodGlucoseChart';
+import { useState } from 'react';
 
 function App() {
-  const today = new Date().toISOString().slice(0, 10);
+  const [date, setDate] = useState(new Date());
+
+  const dateString = date.toISOString().slice(0, 10);
+
   const { data, error, isLoading } = useQuery({ 
-    queryKey: ['entries', today], 
-    queryFn: () => getEntries(today) 
+    queryKey: ['entries', dateString], 
+    queryFn: () => getEntries(dateString) 
   });
+
+  const handlePrevDay = () => {
+    const newDate = new Date(date);
+    newDate.setDate(date.getDate() - 1);
+    setDate(newDate);
+  };
+
+  const handleNextDay = () => {
+    const newDate = new Date(date);
+    newDate.setDate(date.getDate() + 1);
+    setDate(newDate);
+  };
 
   return (
     <>
@@ -19,8 +35,12 @@ function App() {
         </Toolbar>
       </AppBar>
       <Container sx={{ mt: 4 }}>
+        <ButtonGroup sx={{ mb: 2 }}>
+          <Button onClick={handlePrevDay}>Previous Day</Button>
+          <Button onClick={handleNextDay}>Next Day</Button>
+        </ButtonGroup>
         <Typography variant="h4" component="h1" gutterBottom>
-          Dashboard for {today}
+          Dashboard for {dateString}
         </Typography>
         {isLoading && <Typography>Loading...</Typography>}
         {error && <Typography>Error: {error.message}</Typography>}
