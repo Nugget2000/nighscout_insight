@@ -1,10 +1,20 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from api import data
 
 app = FastAPI(
     title="Nightscout Insight API",
     description="API för att hämta och analysera Nightscout-data.",
     version="0.1.0"
+)
+
+# CORS Middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"]
 )
 
 @app.get("/", tags=["Status"])
