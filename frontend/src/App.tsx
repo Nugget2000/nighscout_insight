@@ -6,6 +6,7 @@ import { useState } from 'react';
 import KpiCard from './components/KpiCard';
 import { Kpis } from './models/kpi';
 import TitrKpiCard from './components/TitrKpiCard';
+import AnalysisCard from './components/AnalysisCard';
 
 function App() {
   const [date, setDate] = useState(new Date());
@@ -98,6 +99,9 @@ function App() {
                 </Grid>
               </Grid>
             )}
+          </Grid>
+          <Grid item xs={12}>
+            <AnalysisCard date={dateString} />
           </Grid>
         </Grid>
       </Container>

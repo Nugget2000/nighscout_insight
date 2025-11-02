@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from api import data
+from api import data, analysis
 
 app = FastAPI(
     title="Nightscout Insight API",
@@ -23,3 +23,4 @@ def read_root():
     return {"status": "ok"}
 
 app.include_router(data.router, prefix="/api/v1")
+app.include_router(analysis.router, prefix="/api/v1")
