@@ -1,6 +1,8 @@
 import { Card, CardContent, CircularProgress, Typography } from '@mui/material';
 import { useQuery } from '@tanstack/react-query';
 import { getAnalysis } from '../services/nightscoutService';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 interface AnalysisCardProps {
   date: string;
@@ -21,9 +23,9 @@ const AnalysisCard = ({ date }: AnalysisCardProps) => {
         {isLoading && <CircularProgress />}
         {error && <Typography>Error: {error.message}</Typography>}
         {data && (
-          <pre style={{ whiteSpace: 'pre-wrap', fontFamily: 'inherit' }}>
+          <ReactMarkdown remarkPlugins={[remarkGfm]}>
             {data.analysis}
-          </pre>
+          </ReactMarkdown>
         )}
       </CardContent>
     </Card>
