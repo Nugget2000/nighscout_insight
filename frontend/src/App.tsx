@@ -4,6 +4,7 @@ import { getEntries, getKpis } from './services/nightscoutService';
 import BloodGlucoseChart from './components/BloodGlucoseChart';
 import { useState } from 'react';
 import KpiCard from './components/KpiCard';
+import { Kpis } from './models/kpi';
 
 function App() {
   const [date, setDate] = useState(new Date());
@@ -18,6 +19,19 @@ function App() {
   const { data: kpiData, error: kpiError, isLoading: kpiIsLoading } = useQuery({ 
     queryKey: ['kpis', dateString], 
     queryFn: () => getKpis(dateString) 
+  });
+
+  const { data: kpiHistory, error: kpiHistoryError, isLoading: kpiHistoryIsLoading } = useQuery<Kpis[]>({ 
+    queryKey: ['kpiHistory', dateString], 
+    queryFn: async () => {
+      const promises = [];
+      for (let i = 0; i < 10; i++) {
+        const d = new Date(date);
+        d.setDate(d.getDate() - i);
+        promises.push(getKpis(d.toISOString().slice(0, 10)));
+      }
+      return Promise.all(promises);
+    }
   });
 
   const handlePrevDay = () => {
@@ -57,7 +71,7 @@ function App() {
           <Grid item xs={12} md={4}>
             {kpiIsLoading && <Typography>Loading KPI...</Typography>}
             {kpiError && <Typography>Error loading KPI: {kpiError.message}</Typography>}
-            {kpiData && <KpiCard kpi={kpiData} />}
+            {kpiData && <KpiCard kpi={kpiData} kpiHistory={kpiHistory} />}
           </Grid>
         </Grid>
       </Container>
