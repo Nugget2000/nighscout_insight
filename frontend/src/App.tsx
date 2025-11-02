@@ -1,6 +1,7 @@
 import { AppBar, Container, CssBaseline, Toolbar, Typography } from '@mui/material';
 import { useQuery } from '@tanstack/react-query';
 import { getEntries } from './services/nightscoutService';
+import BloodGlucoseChart from './components/BloodGlucoseChart';
 
 function App() {
   const today = new Date().toISOString().slice(0, 10);
@@ -23,11 +24,7 @@ function App() {
         </Typography>
         {isLoading && <Typography>Loading...</Typography>}
         {error && <Typography>Error: {error.message}</Typography>}
-        {data && (
-          <Typography>
-            Number of entries: {data.length}
-          </Typography>
-        )}
+        {data && <BloodGlucoseChart entries={data} />}
       </Container>
     </>
   );
