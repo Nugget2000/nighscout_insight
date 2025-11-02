@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Security
-from typing import List, Dict
+from typing import List
 
 from services.nightscout_service import get_nightscout_entries, get_nightscout_treatments
 from services.kpi_service import calculate_kpis
@@ -7,6 +7,7 @@ from core.config import settings
 from core.security import get_api_key
 from models.entry import Entry
 from models.treatment import Treatment
+from models.kpi import Kpis
 
 router = APIRouter()
 
@@ -36,7 +37,7 @@ def get_treatments(date: str, api_key: str = Security(get_api_key)):
     )
     return treatments if treatments is not None else []
 
-@router.get("/kpis/{date}", response_model=Dict[str, float], tags=["KPIs"])
+@router.get("/kpis/{date}", response_model=Kpis, tags=["KPIs"])
 def get_kpis(date: str, api_key: str = Security(get_api_key)):
     """Beräknar och returnerar dagliga KPIer för ett specifikt datum."""
     from_date = f"{date}T00:00:00Z"
@@ -48,7 +49,7 @@ def get_kpis(date: str, api_key: str = Security(get_api_key)):
         to_date=to_date
     )
     if not entries:
-        return {}
+        return None
     
     kpis = calculate_kpis(entries)
-    return kpis
+    return Kpis(date=date, **kpis)
