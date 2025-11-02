@@ -1,7 +1,7 @@
 import requests
 from typing import Optional, List
 from pydantic import ValidationError
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from models.entry import Entry
 from models.treatment import Treatment
@@ -15,26 +15,32 @@ def get_nightscout_entries(nightscout_url: str, api_token: str, from_date: str, 
     Args:
         nightscout_url: The URL of the Nightscout instance.
         api_token: The API token for authentication.
-        from_date: The start date in ISO format (YYYY-MM-DD).
-        to_date: The end date in ISO format (YYYY-MM-DD).
+        from_date: The start date in ISO format (YYYY-MM-DDTHH:mm:ss).
+        to_date: The end date in ISO format (YYYY-MM-DDTHH:mm:ss).
         count: The number of entries to fetch (0 for all in range).
 
     Returns:
         A list of validated Entry objects, or None if an error occurred.
     """
-    cache_key = f"entries_{from_date}_{to_date}_{count}"
+    from_date_dt = datetime.fromisoformat(from_date) - timedelta(hours=1)
+    to_date_dt = datetime.fromisoformat(to_date) - timedelta(hours=1)
+
+    from_date_str = from_date_dt.isoformat()
+    to_date_str = to_date_dt.isoformat()
+
+    cache_key = f"entries_{from_date_str}_{to_date_str}_{count}"
     cached_entries = get_cache(cache_key)
 
     if cached_entries:
-        print(f"cache hit for entries for date range {from_date} - {to_date}")
+        print(f"cache hit for entries for date range {from_date_str} - {to_date_str}")
         return [Entry.model_validate(entry_data) for entry_data in cached_entries]
     else:
-        print(f"cache miss for entries for date range {from_date} - {to_date}")
+        print(f"cache miss for entries for date range {from_date_str} - {to_date_str}")
     try:
         params = {
             "count": count,
-            "find[dateString][$gte]": from_date,
-            "find[dateString][$lte]": to_date
+            "find[dateString][$gte]": from_date_str,
+            "find[dateString][$lte]": to_date_str
         }
         request_url = f"{nightscout_url}/api/v1/entries.json?token={api_token}"
         response = requests.get(request_url, params=params)
@@ -62,7 +68,6 @@ def get_nightscout_entries(nightscout_url: str, api_token: str, from_date: str, 
         print(f"Error validating Nightscout data: {e}")
         return None
 
-
 def get_nightscout_treatments(nightscout_url: str, api_token: str, from_date: str, to_date: str, count: int = 0) -> Optional[List[Treatment]]:
     """
     Fetches and validates treatments from the Nightscout API for a specific date range.
@@ -70,14 +75,20 @@ def get_nightscout_treatments(nightscout_url: str, api_token: str, from_date: st
     Args:
         nightscout_url: The URL of the Nightscout instance.
         api_token: The API token for authentication.
-        from_date: The start date in ISO format (YYYY-MM-DD).
-        to_date: The end date in ISO format (YYYY-MM-DD).
+        from_date: The start date in ISO format (YYYY-MM-DDTHH:mm:ss).
+        to_date: The end date in ISO format (YYYY-MM-DDTHH:mm:ss).
         count: The number of treatments to fetch (0 for all in range).
 
     Returns:
         A list of validated Treatment objects, or None if an error occurred.
     """
-    cache_key = f"treatments_{from_date}_{to_date}_{count}"
+    from_date_dt = datetime.fromisoformat(from_date) - timedelta(hours=1)
+    to_date_dt = datetime.fromisoformat(to_date) - timedelta(hours=1)
+
+    from_date_str = from_date_dt.isoformat()
+    to_date_str = to_date_dt.isoformat()
+
+    cache_key = f"treatments_{from_date_str}_{to_date_str}_{count}"
     cached_treatments = get_cache(cache_key)
     if cached_treatments:
         return [Treatment.model_validate(treatment_data) for treatment_data in cached_treatments]
@@ -85,8 +96,8 @@ def get_nightscout_treatments(nightscout_url: str, api_token: str, from_date: st
     try:
         params = {
             "count": count,
-            "find[created_at][$gte]": from_date,
-            "find[created_at][$lte]": to_date
+            "find[created_at][$gte]": from_date_str,
+            "find[created_at][$lte]": to_date_str
         }
         request_url = f"{nightscout_url}/api/v1/treatments.json?token={api_token}"
         response = requests.get(request_url, params=params)
