@@ -5,6 +5,7 @@ import BloodGlucoseChart from './components/BloodGlucoseChart';
 import { useState } from 'react';
 import KpiCard from './components/KpiCard';
 import { Kpis } from './models/kpi';
+import TitrKpiCard from './components/TitrKpiCard';
 
 function App() {
   const [date, setDate] = useState(new Date());
@@ -71,7 +72,16 @@ function App() {
           <Grid item xs={12} md={4}>
             {kpiIsLoading && <Typography>Loading KPI...</Typography>}
             {kpiError && <Typography>Error loading KPI: {kpiError.message}</Typography>}
-            {kpiData && <KpiCard kpi={kpiData} kpiHistory={kpiHistory} />}
+            {kpiData && (
+              <Grid container direction="column" spacing={2}>
+                <Grid item>
+                  <KpiCard kpi={kpiData} kpiHistory={kpiHistory} />
+                </Grid>
+                <Grid item>
+                  <TitrKpiCard kpi={kpiData} kpiHistory={kpiHistory} />
+                </Grid>
+              </Grid>
+            )}
           </Grid>
         </Grid>
       </Container>
