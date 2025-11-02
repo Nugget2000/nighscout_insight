@@ -10,6 +10,20 @@ import TitrKpiCard from './components/TitrKpiCard';
 function App() {
   const [date, setDate] = useState(new Date());
 
+  const formatDate = (date: Date) => {
+    const today = new Date();
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+
+    if (date.toDateString() === today.toDateString()) {
+      return 'Today';
+    }
+    if (date.toDateString() === yesterday.toDateString()) {
+      return 'Yesterday';
+    }
+    return date.toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+  };
+
   const dateString = date.toISOString().slice(0, 10);
 
   const { data: entriesData, error: entriesError, isLoading: entriesIsLoading } = useQuery({ 
@@ -47,6 +61,8 @@ function App() {
     setDate(newDate);
   };
 
+  const isFuture = date.toISOString().slice(0, 10) >= new Date().toISOString().slice(0, 10);
+
   return (
     <>
       <CssBaseline />
@@ -58,10 +74,10 @@ function App() {
       <Container sx={{ mt: 4 }}>
         <ButtonGroup sx={{ mb: 2 }}>
           <Button onClick={handlePrevDay}>Previous Day</Button>
-          <Button onClick={handleNextDay}>Next Day</Button>
+          <Button onClick={handleNextDay} disabled={isFuture}>Next Day</Button>
         </ButtonGroup>
         <Typography variant="h4" component="h1" gutterBottom>
-          Dashboard for {dateString}
+          Dashboard for {formatDate(date)}
         </Typography>
         <Grid container spacing={2}>
           <Grid item xs={12} md={8}>
