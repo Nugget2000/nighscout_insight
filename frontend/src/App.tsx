@@ -1,6 +1,6 @@
-import { AppBar, Button, ButtonGroup, Container, CssBaseline, Grid, Toolbar, Typography } from '@mui/material';
+import { AppBar, Button, ButtonGroup, Container, CssBaseline, Grid, Toolbar, Typography, Tabs, Tab, Box } from '@mui/material';
 import { useQuery } from '@tanstack/react-query';
-import { getEntries, getKpis } from './services/nightscoutService';
+import { getEntries, getKpis, getWeekAnalysis } from './services/nightscoutService';
 import BloodGlucoseChart from './components/BloodGlucoseChart';
 import { useState } from 'react';
 import KpiCard from './components/KpiCard';
@@ -8,9 +8,12 @@ import { Kpis } from './models/kpi';
 import TitrKpiCard from './components/TitrKpiCard';
 import AnalysisCard from './components/AnalysisCard';
 import OtherKpisCard from './components/OtherKpisCard';
+import WeekAnalysisCard from './components/WeekAnalysisCard';
+import { WeekAnalysis } from './models/weekAnalysis';
 
 function App() {
   const [date, setDate] = useState(new Date());
+  const [viewMode, setViewMode] = useState<'day' | 'week'>('day');
 
   const formatDate = (date: Date) => {
     const today = new Date();
@@ -38,7 +41,7 @@ function App() {
     queryFn: () => getKpis(dateString) 
   });
 
-  const { data: kpiHistory, error: kpiHistoryError, isLoading: kpiHistoryIsLoading } = useQuery<Kpis[]>({ 
+  const { data: kpiHistory } = useQuery<Kpis[]>({ 
     queryKey: ['kpiHistory', dateString], 
     queryFn: async () => {
       const promises = [];
@@ -49,6 +52,11 @@ function App() {
       }
       return Promise.all(promises);
     }
+  });
+
+  const { data: weekAnalysis, error: weekError, isLoading: weekIsLoading } = useQuery<WeekAnalysis>({
+    queryKey: ['weekAnalysis', dateString],
+    queryFn: () => getWeekAnalysis(dateString),
   });
 
   const handlePrevDay = () => {
@@ -74,40 +82,59 @@ function App() {
         </Toolbar>
       </AppBar>
       <Container sx={{ mt: 4 }}>
-        <ButtonGroup sx={{ mb: 2 }}>
-          <Button onClick={handlePrevDay}>Previous Day</Button>
-          <Button onClick={handleNextDay} disabled={isFuture}>Next Day</Button>
-        </ButtonGroup>
-        <Typography variant="h4" component="h1" gutterBottom>
-          Dashboard for {formatDate(date)}
-        </Typography>
-        <Grid container spacing={2}>
-          <Grid item xs={12} md={8}>
-            {entriesIsLoading && <Typography>Loading chart...</Typography>}
-            {entriesError && <Typography>Error loading chart: {entriesError.message}</Typography>}
-            {entriesData && <BloodGlucoseChart entries={entriesData} />}
-          </Grid>
-          <Grid item xs={12} md={4}>
-            {kpiIsLoading && <Typography>Loading KPI...</Typography>}
-            {kpiError && <Typography>Error loading KPI: {kpiError.message}</Typography>}
-            {kpiData && (
-              <Grid container direction="column" spacing={2}>
-                <Grid item>
-                  <OtherKpisCard kpi={kpiData} />
-                </Grid>
-                <Grid item>
-                  <KpiCard kpi={kpiData} kpiHistory={kpiHistory} />
-                </Grid>
-                <Grid item>
-                  <TitrKpiCard kpi={kpiData} kpiHistory={kpiHistory} />
-                </Grid>
+        <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 2 }}>
+          <Tabs value={viewMode} onChange={(_, newValue) => setViewMode(newValue)}>
+            <Tab label="Daily View" value="day" />
+            <Tab label="Weekly View" value="week" />
+          </Tabs>
+        </Box>
+
+        {viewMode === 'day' && (
+          <>
+            <ButtonGroup sx={{ mb: 2 }}>
+              <Button onClick={handlePrevDay}>Previous Day</Button>
+              <Button onClick={handleNextDay} disabled={isFuture}>Next Day</Button>
+            </ButtonGroup>
+            <Typography variant="h4" component="h1" gutterBottom>
+              Dashboard for {formatDate(date)}
+            </Typography>
+            <Grid container spacing={2}>
+              <Grid item xs={12} md={8}>
+                {entriesIsLoading && <Typography>Loading chart...</Typography>}
+                {entriesError && <Typography>Error loading chart: {entriesError.message}</Typography>}
+                {entriesData && <BloodGlucoseChart entries={entriesData} />}
               </Grid>
-            )}
-          </Grid>
-          <Grid item xs={12}>
-            <AnalysisCard date={dateString} />
-          </Grid>
-        </Grid>
+              <Grid item xs={12} md={4}>
+                {kpiIsLoading && <Typography>Loading KPI...</Typography>}
+                {kpiError && <Typography>Error loading KPI: {kpiError.message}</Typography>}
+                {kpiData && (
+                  <Grid container direction="column" spacing={2}>
+                    <Grid item>
+                      <OtherKpisCard kpi={kpiData} />
+                    </Grid>
+                    <Grid item>
+                      <KpiCard kpi={kpiData} kpiHistory={kpiHistory} />
+                    </Grid>
+                    <Grid item>
+                      <TitrKpiCard kpi={kpiData} kpiHistory={kpiHistory} />
+                    </Grid>
+                  </Grid>
+                )}
+              </Grid>
+              <Grid item xs={12}>
+                <AnalysisCard date={dateString} />
+              </Grid>
+            </Grid>
+          </>
+        )}
+
+        {viewMode === 'week' && (
+          <WeekAnalysisCard 
+            weekAnalysis={weekAnalysis} 
+            isLoading={weekIsLoading} 
+            error={weekError} 
+          />
+        )}
       </Container>
     </>
   );

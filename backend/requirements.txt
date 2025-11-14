@@ -1,5 +1,5 @@
-fastapi
-uvicorn[standard]
+fastapi=0.121.2
+uvicorn[standard]=0.38
 pydantic
 python-dotenv
 google-cloud-firestore
